@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class InmuebleController {
@@ -30,10 +31,20 @@ public class InmuebleController {
     }
 
     // Mostrar un Registro
-    @DeleteMapping ("/inmuebles/{id}")
-    public void findById (@PathVariable Long id) {
-        if (repository.existsById(id))
-            repository.findById(id);
+    // Utilizando el id
+    @GetMapping ("/inmuebles/{id}")
+    public Inmueble findById (@PathVariable Long id) {
+        Optional<Inmueble> inmuebleOpt = repository.findById(id);
+        if (inmuebleOpt.isPresent())
+            return inmuebleOpt.get();
+        else
+            return null;
+        // return inmuebleOpt.orElse(null);
+    }
+    // Utilizando la inmobiliaria
+    @GetMapping ("/inmuebles/{inmobiliaria}")
+    public List<Inmueble> findByInmobiliaria (@PathVariable String inmobiliaria) {
+        return repository.findByInmobiliaria(inmobiliaria);
     }
 
     // Creamos un método para tener registros en base de datos
@@ -45,33 +56,6 @@ public class InmuebleController {
         repository.save(casa);
         repository.save(chalet);
         repository.save(piso);
-    }
-
-    // Crear Registros
-    @PostMapping ("/inmuebles")
-    public void create (@RequestBody Inmueble inmueble) {
-        if (inmueble.getId() == null)
-            repository.save(inmueble);
-    }
-
-    // Actualizar Registros
-    @PutMapping ("/inmuebles")
-    public void update (@RequestBody Inmueble inmueble) {
-        if (inmueble.getId() != null && repository.existsById(inmueble.getId()))
-            repository.save(inmueble);
-    }
-
-    // Borrar un Registro
-    @DeleteMapping ("/inmuebles/{id}")
-    public void deleteById (@PathVariable Long id) {
-        if (repository.existsById(id))
-            repository.deleteById(id);
-    }
-
-    // Borrar todos los Registros
-    @DeleteMapping ("/inmuebles")
-    public void deleteAll () {
-        repository.deleteAll();
     }
 
 }
